@@ -1,0 +1,5 @@
+com\vallegrande\msuser\Repository\UserRepository.class
+com\vallegrande\msuser\Exception\ResourceNotFoundException.class
+com\vallegrande\msuser\Controller\UserController.class
+com\vallegrande\msuser\MsUserApplication.class
+com\vallegrande\msuser\Domain\User.class
