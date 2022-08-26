@@ -1,0 +1,285 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./Plantilla.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="content">
+        <h:head>
+            <title>Listado de la Liquidacion</title>
+            <f:event listener="#{LiquidacionC.listar()}" type="preRenderView" />
+            <f:event type="preRenderView" listener="#{usuarioC.seguridadSesion()}"/>
+        </h:head>
+        <h:body>      
+            <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+            <p:growl id="mensaje" showDetail="true" />
+            <p:growl id="growl-sticky" for="sticky-key" showDetail="true" sticky="true" />
+
+            <h:form id="form">
+                <center>
+
+                    <!--    Formulario del LIQUIDACION    >-->         
+                    <p:panelGrid columns="3">
+                        <f:facet name= "header"> DATOS DE LA LIQUIDACION </f:facet> 
+                        <p:outputLabel value="Solicitante" for="per"/>
+                        <p:selectOneMenu id="per" value="#{LiquidacionC.liq.provisional.idval}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el solicitante" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{ValeProvisionalC.listadoValeProvisional}" var="solicitante"
+                                           itemValue="#{solicitante.idval}"
+                                           itemLabel="#{solicitante.nomper}"/>
+                            <p:ajax update="msgNombres" event="keyup" delay="800"  />
+                            <p:tooltip for="per" trackMouse="focus"/>
+                        </p:selectOneMenu>
+                        <p:message  id="msgNombres" for="per" />
+
+                        <p:outputLabel value="Motivo" for="actividad"/>
+                        <p:inputText id="actividad" value="#{LiquidacionC.liq.MOTLIQ}" maxlength="200" required="true" requiredMessage="Digitar el motivo">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _-]/"/>
+                            <p:tooltip for="actividad" value="Digitar la actividad" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message   for="actividad" />
+
+                        <p:outputLabel value="Fecha"/>
+                        <p:calendar id="Fecval" value="#{LiquidacionC.liq.FECLIQ}"
+                                    showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                    size="20" required="true" requiredMessage="Ingrese la fecha" >
+                        </p:calendar>   
+                        <p:message   for="Fecval" />
+
+                        <p:outputLabel value="Centro de Costo" for="cencos"/>
+                        <p:selectOneMenu id="cencos" value="#{LiquidacionC.liq.CODCEN}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el Centro de Costo" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                           itemValue="#{centrocosto.CODCEN}"
+                                           itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                        </p:selectOneMenu>
+                        <p:message for="cencos" />
+
+                        <p:outputLabel value="Forma de Pago"  for="forma"/>
+                        <p:selectOneMenu id="forma" value="#{LiquidacionC.liq.FORLIQ}"  required="true" requiredMessage="Digitar la forma de pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Soles " itemValue="Soles"/>
+                            <f:selectItem itemLabel="Dolar" itemValue="Dolar"/>      
+                        </p:selectOneMenu>
+                        <p:message for="forma" />
+
+                        <p:outputLabel value="M.Gastado"  for="importe" />
+                        <p:inputText id="importe" value="#{LiquidacionC.liq.GASLIQ}" maxlength="5"  required="true" requiredMessage="Digitarel monto gastado">
+                            <p:keyFilter regEx="/[0-9_.]/" />
+                            <p:tooltip for="importe" value="Digite el importe" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message for="importe" />
+
+                        <p:outputLabel value="Saldo"  for="gasado" />
+                        <p:inputText id="gasado" value="#{LiquidacionC.liq.SALLIQ}" maxlength="5"  required="true" requiredMessage="Digitarel monto">
+                            <p:keyFilter regEx="/[0-9_.]/" />
+                            <p:tooltip for="importe" value="Digite el importe" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message for="gasado" />
+
+                        <p></p>
+
+                        <p:commandButton value="Registrar" actionListener="#{LiquidacionC.registrar()}" update="form :formtwo:tablaLiq mensaje"  style="background-color:  background"/>
+                    </p:panelGrid>
+
+                </center>
+                <!--    Formulario de la liquidación   >-->
+            </h:form>
+
+
+
+            <h:form id="formtwo">
+                <!--              Listado de la liquidacion-->
+                <p:dataTable var="tblliq" id="tablaLiq" value="#{LiquidacionC.listadoLiq}" rows="10" 
+                             paginator="true" widgetVar="tblLiquidacion" selection="#{LiquidacionC.liq}" 
+                             resizableColumns="true" 
+                             selectionMode="single"
+                             rowKey="#{tblliq.IDLIQ}"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             rowsPerPageTemplate="5,10,{ShowAll|'All'}" 
+                             rowStyleClass="registroVinculado">
+
+                    <f:facet name="header">
+                        <center>
+                            <div style="float: left">
+                                <h:form>
+                                    <p:outputLabel value="FILTRO POR: " style="align-content: center; alignment-adjust: central; color:black font-weight:bold "/>
+                                    <center>
+                                        <p:selectOneMenu value="#{LiquidacionC.tipo}" style="width: 100px">
+                                            <f:selectItem itemValue="1" itemLabel="Activos"/> 
+                                            <f:selectItem itemValue="2" itemLabel="Inactivos"/>
+                                            <f:selectItem itemValue="3" itemLabel="Todos"/>
+                                            <p:ajax listener="#{LiquidacionC.listar()}" update=":formtwo:tablaLiq"/>
+                                        </p:selectOneMenu>
+                                    </center>
+                                </h:form>
+                            </div>
+
+                            <!--                            <p:outputPanel>
+                                                            <h:outputText value="Buscar:"/>
+                                                            <h:inputText id="globalFilter" onkeyup="PF('tblLiquidacion').filter()" style="width:200px"/>
+                                                        </p:outputPanel>-->
+
+                            <div style="float: right">
+                                <p:commandButton value="Exportar Liquidacion" actionListener="#{LiquidacionC.reporteLiquidación()}" 
+                                                 ajax="false" style="background-color:yellowgreen;color:black;font-weight:bold;"/>
+                                <p:commandButton value="PDF" icon="pi pi-file-pdf" styleClass="p-mr-2 p-mb-2">
+                                    <p:dataExporter type="pdf" target=":formtwo:tablaLiq" fileName="ListaLiquidacion_PDF" options="#{LiquidacionC.pdfOpt}" pageOnly="true" />
+                                </p:commandButton>
+                                <p:commandButton value="Excel" icon="pi pi-file-excel" styleClass="p-mr-2 p-mb-2">
+                                    <p:dataExporter type="xls" target=":formtwo:tablaLiq" fileName="ListaLiquidacion_XLS" options="#{LiquidacionC.excelOpt}" pageOnly="true" />
+                                </p:commandButton>     
+                            </div>
+                        </center>
+                    </f:facet>
+                    <p/>
+
+                    <center> 
+                        <f:facet name= "header"><center style="color:black; font-weight:bold; font-size:25px">LISTADO DE LA LIQUIDACIÓN</center></f:facet>
+
+                        <p:column style="width:30px" headerText="Nombre" sortBy="#{tblliq.NOMPER}" filterBy="#{tblliq.NOMPER}" > 
+
+                            <h:outputText value="#{tblliq.NOMPER} - #{tblliq.APEPER}" />
+                        </p:column>          
+<!--                        <p:column style="width:40px" headerText="Dni" sortBy="#{tblliq.DNIPER}" filterBy="#{tblliq.DNIPER}">
+                            <h:outputText value="#{tblliq.DNIPER}" />
+                        </p:column>-->
+<!--                        <p:column style="width:40px" headerText="Fecha S"  sortBy="#{tblliq.FECVAL}" filterBy="#{tblliq.FECVAL}">
+                            <h:outputText value="#{tblliq.FECVAL}" />
+                        </p:column>-->
+<!--                        <p:column style="width:15px" headerText="N°V." sortBy="#{tblliq.IDVAL}" filterBy="#{tblliq.IDVAL}">
+                            <h:outputText value="#{tblliq.IDVAL}" />
+                        </p:column>-->
+                        <p:column style="width:110px" headerText="Motivo" sortBy="#{tblliq.MOTLIQ}" filterBy="#{tblliq.MOTLIQ}">
+                            <h:outputText value="#{tblliq.MOTLIQ}" />
+                        </p:column>              
+<!--                        <p:column style="width:35px" headerText="Fecha" sortBy="#{tblliq.FECLIQ}" filterBy="#{tblliq.FECLIQ}">
+                            <h:outputText value="#{tblliq.FECLIQ}">
+                                <f:convertDateTime type="Date" pattern="dd-MMM-yyyy"/>
+                            </h:outputText>
+                        </p:column>-->
+                        <p:column style="width:92px" headerText="Centro de Costo" sortBy="#{tblliq.DESCEN}" filterBy="#{tblliq.DESCEN}">
+                            <h:outputText value="#{tblliq.DESCEN} - #{tblliq.CODCEN} - #{tblliq.ARECEN}" /> 
+                        </p:column>           
+                        <p:column style="width:10px" headerText="Pago" sortBy="#{tblliq.FORLIQ}" filterBy="#{tblliq.FORLIQ}">
+                            <h:outputText value="#{tblliq.FORLIQ}" />
+                        </p:column>    
+                        <p:column style="width:10px" headerText="Imp.S" sortBy="#{tblliq.impval}" filterBy="#{tblliq.impval}">
+                            <h:outputText value="#{tblliq.impval}" />
+                        </p:column>    
+                        <p:column style="width:10px" headerText="Gasto" sortBy="#{tblliq.GASLIQ}" filterBy="#{tblliq.GASLIQ}">
+                            <h:outputText value="#{tblliq.GASLIQ}" />
+                        </p:column> 
+                        <p:column style="width:10px" headerText="Saldo" sortBy="#{tblliq.SALLIQ}" filterBy="#{tblliq.SALLIQ}">
+                            <h:outputText value="#{tblliq.SALLIQ}" />
+                        </p:column> 
+                    </center>
+                    <f:facet name="footer">     
+                        EN TOTAL HAY  #{fn:length(LiquidacionC.listadoLiq)} REGISTROS.       
+                    </f:facet>           
+                </p:dataTable>
+
+
+                <p:contextMenu for="tablaLiq">
+                    <p:menuitem value="Modificar" icon="pi pi-pencil" oncomplete="PF('wdlgDatos').show()" update=":formthree">
+                    </p:menuitem>
+                    <p:menuitem value="Eliminar" icon="pi pi-trash" actionListener="#{LiquidacionC.DeleteEstado()}" update=":formtwo:tablaLiq mensaje">
+                        <p:confirm header="Confirmación" message="¿Deseas eliminar?"/>                         
+                    </p:menuitem>
+                </p:contextMenu>
+
+
+                <!--            Listado de la liquidacion-->
+            </h:form>
+
+
+            <!--DATOS DEL PERSONAL-->
+            <p:dialog header="Datos de la liquidación" widgetVar="wdlgDatos" id="dlgDatos">
+                <h:form id="formthree">
+                    <p:panelGrid columns="3">                          
+
+                        <p:outputLabel value="Solicitante" for="per"/>
+                        <p:selectOneMenu id="per" value="#{LiquidacionC.liq.provisional.idval}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el solicitante" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{ValeProvisionalC.listadoValeProvisional}" var="solicitante"
+                                           itemValue="#{solicitante.idval}"
+                                           itemLabel="#{solicitante.nomper}"/>
+                            <p:ajax update="msgNombres" event="keyup" delay="800"  />
+                            <p:tooltip for="per" trackMouse="focus"/>
+                        </p:selectOneMenu>
+                        <p:message  id="msgNombres" for="per" />
+
+                        <p:outputLabel value="Motivo" for="actividad"/>
+                        <p:inputText id="actividad" value="#{LiquidacionC.liq.MOTLIQ}" maxlength="200" required="true" requiredMessage="Digitar el motivo">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _-]/"/>
+                            <p:tooltip for="actividad" value="Digitar la actividad" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message   for="actividad" />
+
+                        <p:outputLabel value="Fecha"/>
+                        <p:calendar id="Fecval" value="#{LiquidacionC.liq.FECLIQ}"
+                                    showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                    size="20" required="true" requiredMessage="Ingrese la fecha" >
+                        </p:calendar>   
+                        <p:message   for="Fecval" />
+
+                        <p:outputLabel value="Centro de Costo" for="cencos"/>
+                        <p:selectOneMenu id="cencos" value="#{LiquidacionC.liq.CODCEN}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el Centro de Costo" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                           itemValue="#{centrocosto.CODCEN}"
+                                           itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                        </p:selectOneMenu>
+                        <p:message for="cencos" />
+
+                        <p:outputLabel value="Forma de Pago"  for="forma"/>
+                        <p:selectOneMenu id="forma" value="#{LiquidacionC.liq.FORLIQ}"  required="true" requiredMessage="Digitar la forma de pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Soles " itemValue="Soles"/>
+                            <f:selectItem itemLabel="Dolar" itemValue="Dolar"/>      
+                        </p:selectOneMenu>
+                        <p:message for="forma" />
+
+                        <p:outputLabel value="M.Gastado"  for="importe" />
+                        <p:inputText id="importe" value="#{LiquidacionC.liq.GASLIQ}" maxlength="5"  required="true" requiredMessage="Digitarel monto gastado">
+                            <p:keyFilter regEx="/[0-9_.]/" />
+                            <p:tooltip for="importe" value="Digite el importe" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message for="importe" />
+
+                        <p:outputLabel value="Saldo"  for="gasado" />
+                        <p:inputText id="gasado" value="#{LiquidacionC.liq.SALLIQ}" maxlength="5"  required="true" requiredMessage="Digitarel monto">
+                            <p:keyFilter regEx="/[0-9_.]/" />
+                            <p:tooltip for="importe" value="Digite el importe" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message for="gasado" />
+
+                        <p></p>
+
+                        <p></p>
+                        <p:commandButton value="Modificar" actionListener="#{LiquidacionC.modificar()}" 
+                                         update=":formtwo:tablaLiq" oncomplete="PF('wdlgDatos').hide();" >
+                            <p:confirm header="Confirmación" message="¿Deseas Modificar?" icon="ui-icon-alert"/>
+                            <p:tooltip trackMouse="true"/>
+                        </p:commandButton>
+                        <p:commandButton value="Cancelar" immediate="true" oncomplete="PF('wdlgDatos').hide();" />
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                        </p:confirmDialog>
+                    </p:panelGrid>
+                </h:form>
+            </p:dialog>
+        </h:body>
+    </ui:define>
+</ui:composition>

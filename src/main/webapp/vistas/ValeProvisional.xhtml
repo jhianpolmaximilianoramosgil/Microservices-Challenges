@@ -1,0 +1,264 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./Plantilla.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="content">
+        <h:head>
+            <title>Listado de Vale Provisional</title>
+            <f:event listener="#{ValeProvisionalC.listar()}" type="preRenderView" />
+            <f:event type="preRenderView" listener="#{usuarioC.seguridadSesion()}"/>
+        </h:head>
+        <h:body>      
+            <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+            <p:growl id="mensaje" showDetail="true" />
+            <p:growl id="growl-sticky" for="sticky-key" showDetail="true" sticky="true" />
+
+            <div>
+                <center>
+                    <h:form id="opciones">
+                        <h1 style="font-size: 2rem; font-weight:bold;color: blue"> REGISTRO DE VALE PROVISIONAL</h1>
+                        <hr></hr>
+                        <p:panelGrid columns="1" style="align-content: center">
+                            <!--                        <i class="pi pi-spin pi-spinner" style="font-size: 2rem" >-->
+                            <p:commandButton value="Nuevo Registro"  icon="pi pi-pencil" oncomplete="PF('wdlgRegistrar').show();" update=":formthree" style="font-size: 2rem; font-weight:bold"/>
+                            <!--                    class="pi pi-spin pi-spinner" </i>-->
+                        </p:panelGrid>
+                        <hr></hr>
+                    </h:form>
+                </center> 
+            </div>
+
+            <p:dialog header="Registro de Vale Provisional " widgetVar="wdlgRegistrar" id="dlgRegistrar"> 
+                <h:form id="form">
+                    <center>
+                        <!--    Formulario de Vale Provisional  >-->   
+                        <p:panelGrid columns="3">
+                            <f:facet name= "header"> DATOS DE VALE PROVISIONAL </f:facet> 
+                            <p:outputLabel id="imp" value="Importe" for="imp"/>
+                            <p:inputText value="#{ValeProvisionalC.provisional.impval}"  maxlength="3" required="true" requiredMessage="Digitar de 1 a 100" >
+                                <f:validateLongRange minimum="1" maximum="100"> </f:validateLongRange>                       
+                            </p:inputText>
+                            <p:message for="imp" />
+
+                            <p:outputLabel   value="Fecha" for="Fecval" />
+                            <p:calendar id="Fecval" value="#{ValeProvisionalC.provisional.fecval}"
+                                        showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                        size="20" required="true" requiredMessage="Ingrese la fecha" >
+                            </p:calendar>                   
+                            <p:message for="Fecval" />
+
+                            <p:outputLabel value="Centro de Costo" for="cencos"/>
+                            <p:selectOneMenu id="cencos" value="#{ValeProvisionalC.provisional.codcen}" style="width:300px"
+                                             filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el Centro de Costo" >
+                                <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                                <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                               itemValue="#{centrocosto.CODCEN}"
+                                               itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                            </p:selectOneMenu>
+                            <p:message for="cencos" />
+
+                            <p:outputLabel value="Proyecto" for="proyec"/>
+                            <p:inputText id="proyec" value="#{ValeProvisionalC.provisional.proval}" maxlength="500" required="true" requiredMessage="Digitar el proyecto">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                            </p:inputText>
+                            <p:message for="proyec" />
+
+                            <p:outputLabel id="act" value="Actividad" for="act"/>
+                            <p:inputText value="#{ValeProvisionalC.provisional.actval}" maxlength="500" required="true" requiredMessage="Digitar la actividad">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                            </p:inputText>
+                            <p:message for="act" />
+
+                            <p:outputLabel value="Solicitante" for="per"/>
+                            <p:selectOneMenu id="per" value="#{ValeProvisionalC.provisional.personal.idper}" style="width:300px"
+                                             filter="true" filterMatchMode="contains" requiredMessage="Seleccione el solicitante" >
+                                <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                                <f:selectItems value="#{personaC.listadoPer}" var="solicitante"
+                                               itemValue="#{solicitante.idper}"
+                                               itemLabel="#{solicitante.nombre}
+                                               #{solicitante.apellido}"/>
+                            </p:selectOneMenu>
+                            <p:message for="per" />
+
+                            <p:commandButton value="Registrar" actionListener="#{ValeProvisionalC.registrar()}" update=" form :formtwo:tablaVal mensaje " oncomplete="PF('wdlgRegistrar').hide();"/> 
+                            <!--                <p:commandButton value="Listar" actionListener="{DeJuradaC.listar()}" update="tablaDec" />          -->
+
+                        </p:panelGrid>
+                    </center>
+                </h:form>
+                <!--    Fimal del Formulario de vale provisional   >-->
+            </p:dialog>
+
+
+
+
+
+            <h:form id="formtwo">
+                <!--              Listado de vale provisional-->
+                <p:dataTable var="tblval" id="tablaVal" value="#{ValeProvisionalC.listadoValeProvisional}" rows="10" 
+                             paginator="true" widgetVar="tblValeProvisional" selection="#{ValeProvisionalC.provisional}" 
+                             resizableColumns="true" 
+                             selectionMode="single"
+                             rowKey="#{tblval.idval}"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             rowsPerPageTemplate="5,10,{ShowAll|'All'}" 
+                             rowStyleClass="registroVinculado">  
+                    <f:facet name="header">
+                        <center> 
+                            <div style="float: left">
+                                <h:form>
+                                    <p:outputLabel value="FILTRO POR: " style="align-content: center; alignment-adjust: central; color:black font-weight:bold "/>
+                                    <center>
+                                        <p:selectOneMenu value="#{ValeProvisionalC.tipo}" style="width: 100px">
+                                            <f:selectItem itemValue="1" itemLabel="Activos"/> 
+                                            <f:selectItem itemValue="2" itemLabel="Inactivos"/>
+                                            <f:selectItem itemValue="3" itemLabel="Todos"/>
+                                            <p:ajax listener="#{ValeProvisionalC.listar()}" update=":formtwo:tablaVal"/>
+                                        </p:selectOneMenu>
+                                    </center>
+                                </h:form>
+                            </div>
+
+                            <!--                            <p:outputPanel>
+                                                            <h:outputText value="Buscar:"/>
+                                                            <h:inputText id="globalFilter" onkeyup="PF('tblValeProvisional').filter()" style="width:200px"/>
+                                                        </p:outputPanel>-->
+
+                            <div style="float: right">
+
+                                <p:commandButton value="GENERAR REPORTE" actionListener="#{ValeProvisionalC.reporteValeProvisional()}"  onclick="this.form.target = '_blank'"
+                                                 ajax="false" style="weight:bold"/>  
+
+                                <p:commandButton value="EXCEL" icon="pi pi-file-excel" styleClass="p-mr-2 p-mb-2">
+                                    <p:dataExporter type="xls" target=":formtwo:tablaVal" fileName="ListaDeValeProvisional_XLS" options="#{ValeProvisionalC.excelOpt}" />
+                                </p:commandButton>
+
+                            </div>
+                        </center>
+                    </f:facet>
+                    <p/>
+
+                    <f:facet name= "header"><center style="color:black; font-weight:bold; font-size:25px">LISTADO DE LOS VALE PROVISIONAL</center></f:facet>
+                    <p:column style="width:10px" headerText="Id">
+                        <h:outputText value="#{tblval.idval}"/>
+                    </p:column>
+                    <p:column style="width:30px" headerText="Importe"  sortBy="#{tblval.impval}" filterBy="#{tblval.impval}">
+                        <h:outputText value="#{tblval.impval}" />
+                    </p:column>
+                    <p:column style="width:35px" headerText="Fecha" sortBy="#{tblval.fecval}" filterBy="#{tblval.fecval}">
+                        <h:outputText value="#{tblval.fecval}">
+                            <f:convertDateTime type="Date" pattern="dd-MMM-yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width:35px" headerText="Centro de Costo"  sortBy="#{tblval.descen}" filterBy="#{tblval.descen}">
+                        <h:outputText value="#{tblval.descen} - #{tblval.codcen} - #{tblval.arecen}" />
+                    </p:column>
+                    <p:column style="width:35px" headerText="Proyecto"  sortBy="#{tblval.proval}" filterBy="#{tblval.proval}">
+                        <h:outputText value="#{tblval.proval}" />
+                    </p:column>
+                    <p:column style="width:70px" headerText="Actividad"  sortBy="#{tblval.actval}" filterBy="#{tblval.actval}">
+                        <h:outputText value="#{tblval.actval}" />
+                    </p:column>
+
+                    <p:column style="width:80px" headerText="Solicitante"  sortBy="#{tblval.nomper}" filterBy="#{tblval.nomper}"> 
+                        <h:outputText value="#{tblval.nomper}" />
+                    </p:column>
+
+                    <p:column headerText="" style="width:15px; color:black" exportable="false">
+                        <p:commandButton id="vale" actionListener="#{ValeProvisionalC.reporteIdVal(tblval)}" ajax="false"
+                                         onclick="this.form.target = '_blank'" icon="pi pi-arrow-down">
+                            <p:tooltip for="vale" value="VISUALIZACIÓN DEL VALE" trackMouse="focus"/>
+                        </p:commandButton>
+                    </p:column>
+
+
+
+                    <f:facet name="footer">
+                        <center style="color:black; font-weight: bold; font-size: 20px">
+                            EN TOTAL HAY #{fn:length(ValeProvisionalC.listadoValeProvisional)} REGISTROS.
+                        </center>
+                    </f:facet>
+
+                </p:dataTable>   
+                <p:contextMenu for="tablaVal">
+                    <p:menuitem value="Modificar" icon="pi pi-pencil" oncomplete="PF('wdlgDatos').show()" update=":formthree">
+                    </p:menuitem>
+                    <p:menuitem value="Eliminar" icon="pi pi-trash" actionListener="#{ValeProvisionalC.DeleteEstado()}" 
+                                update=" :formtwo:tablaVal mensaje">
+
+                        <p:confirm header="Confirmación" message="¿Deseas eliminar?"/>                 
+                    </p:menuitem>
+                </p:contextMenu>
+
+            </h:form>
+
+
+            <!--DATOS DE VALE PROVISIONAL-->
+            <p:dialog header="Datos de vale provisional" widgetVar="wdlgDatos" id="dlgDatos">
+                <h:form id="formthree">
+                    <p:panelGrid columns="2">
+                        <p:outputLabel value="Importe" />
+                        <p:inputText value="#{ValeProvisionalC.provisional.impval}"  maxlength="3" requiredMessage="Digitar de 1 a 100" >
+                            <f:validateLongRange minimum="1" maximum="100"> </f:validateLongRange>                       
+                        </p:inputText>
+
+                        <p:outputLabel value="Fecha"/>
+                        <p:calendar id="Fecval" value="#{ValeProvisionalC.provisional.fecval}"
+                                    showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                    size="20"  requiredMessage="Ingrese la fecha" >
+                        </p:calendar>                   
+
+                        <p:outputLabel value="Centro de Costo" />
+                        <p:selectOneMenu id="cencos" value="#{ValeProvisionalC.provisional.codcen}" style="width:300px"
+                                         filter="true" filterMatchMode="contains"  requiredMessage="Seleccione el Centro de Costo" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                           itemValue="#{centrocosto.CODCEN}"
+                                           itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                        </p:selectOneMenu>
+
+
+                        <p:outputLabel value="Proyecto" />
+                        <p:inputText value="#{ValeProvisionalC.provisional.proval}" maxlength="500"  requiredMessage="Digitar el proyecto">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/[0-9]/"/>
+                        </p:inputText>
+
+
+                        <p:outputLabel value="Actividad" />
+                        <p:inputText value="#{ValeProvisionalC.provisional.actval}" maxlength="500"  requiredMessage="Digitar la actividad">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                        </p:inputText>
+                        <p:outputLabel value="Solicitante"/>
+                        <p:selectOneMenu id="per" value="#{ValeProvisionalC.provisional.personal.idper}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" requiredMessage="Seleccione el solicitante" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{personaC.listadoPer}" var="solicitante"
+                                           itemValue="#{solicitante.idper}"
+                                           itemLabel="#{solicitante.nombre}
+                                           #{solicitante.apellido}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton value="Modificar" actionListener="#{ValeProvisionalC.modificar()}" 
+                                         update=" :formtwo:tablaVal mensaje" oncomplete="PF('wdlgDatos').hide();" >
+                            <p:confirm header="Confirmación" message="¿Deseas Modificar?" icon="ui-icon-alert"/>
+                            <p:tooltip trackMouse="true"/>
+                        </p:commandButton>
+                        <p:commandButton value="Cancelar" immediate="true" oncomplete="PF('wdlgDatos').hide();" />
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                        </p:confirmDialog>
+                    </p:panelGrid>
+                </h:form>          
+            </p:dialog>
+        </h:body>
+    </ui:define>
+
+</ui:composition>

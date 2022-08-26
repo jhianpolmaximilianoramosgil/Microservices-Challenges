@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>SISREGVG</title>
+
+        <link rel ="stylesheet" type="text/css" href="../resources/css/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/css/fontawesome-all.min.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/css/iofrm-style.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/css/iofrm-theme7.css"/>
+        <link href="resources/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="resources/css/fontawesome-all.min.css" rel="stylesheet" type="text/css"/>
+        <link href="resources/css/iofrm-style.css" rel="stylesheet" type="text/css"/>
+        <link href="resources/css/iofrm-theme7.css" rel="stylesheet" type="text/css"/>
+
+    </h:head>
+    <p:growl id="mensajes" severity="info,fatal,warn,error" showSummary="true" showDetail="true"/>
+    <h:body id="body">
+        <p:growl id="msj" showDetail="true" >
+            <p:autoUpdate/>
+        </p:growl>
+        <div class="form-body">
+            <div class="row">
+                <div class="img-holder">
+                    <div class="bg"></div>
+                    <div class="info-holder">
+                        <img src="resources/images/azul.png" alt=""/>
+                    </div>
+                </div>
+                <div class="form-holder">
+                    <div class="form-content">
+                        <div class="form-items">
+
+                            <h3 class="title" style="color:black; font-weight:bold; font-size:50px"> <center> SISREGVG</center> </h3>
+                            <p> SISTEMA DE REGISTRO DE EGRESOS DE VALLE GRANDE </p>
+
+                            <div class="page-links">
+                                <!--<a class="active">Iniciar Sesión</a><a href="/Sisregvg_ODAO/faces/registrar.xhtml">Registrar</a>-->
+                                <a class="active" ></a><a href="/Sisregvg_ODAO/faces/refactorPWD.xhtml"> Ayuda </a>
+                                <a class="active" ></a><a href="/Sisregvg_ODAO/faces/WEB/PageWebSisregvg.xhtml"> SISREGVG </a>
+                            </div>
+                            <h:form id="frminiciarsesion">
+
+                                <h3 class="title" style="color:black; font-weight:bold; font-size:14px">  Si ya eres un trabajador en esta empresa, por favor, rellena tus datos a continuación. Si aún no te has registrado, puedes solicitar un registro al Administrador</h3>
+                                <p:inputText  type="text" value="#{usuarioC.usuario.USUUSU}" placeholder="Usuario"/>
+                                <p:inputText  type="password" id="Pas" value="#{usuarioC.usuario.PWDUSU}" placeholder="Contraseña"/>
+
+                                <div class="form-button">
+
+
+                                    <p:captcha label="Captcha" requiredMessage="Falta verificar Captcha" rendered="#{usuarioC.captcha == 1 eq true}"/>
+                                    <center> 
+                                    <p:commandButton id="btnlogin" actionListener="#{usuarioC.acceso()}"
+                                                     value="INICIAR SESIÓN" update="frminiciarsesion,:mensajes,btnlogin"
+                                                     onstart="if(#{usuarioC.bloquear}){PF('widgetBlock').show()}"
+                                                     oncomplete="PF('widgetBlock').hide()"
+                                                     class="boton">
+                                    </p:commandButton>
+                                     </center>
+                                    <p:blockUI block="frminiciarsesion" widgetVar="widgetBlock">
+                                        <p:graphicImage value="resources/images/carga.gif"></p:graphicImage>
+                                    </p:blockUI>
+                                </div>
+                            </h:form>
+                        </div>
+
+                        <div class="other-links">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </h:body>
+</html>

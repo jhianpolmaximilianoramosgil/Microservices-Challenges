@@ -1,0 +1,297 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./Plantilla.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="content">
+
+        <h:head>
+            <title>Listado de Documentos </title>
+            <f:event listener="#{ReembolsoC.listar()}" type="preRenderView" />
+            <f:event type="preRenderView" listener="#{usuarioC.seguridadSesion()}"/>
+        </h:head>
+        <h:body>      
+            <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+            <p:growl id="mensaje" showDetail="true" />
+            <p:growl id="growl-sticky" for="sticky-key" showDetail="true" sticky="true" />
+
+            <h:form id="form">
+                <center>
+                    <!--    Formulario de  Reembolso    >-->         
+                    <p:panelGrid columns="3">
+                        <f:facet name= "header"> DATOS DEL REEMBOLSO </f:facet>                    
+                        <p:outputLabel value="Solicitante" for="per"/>
+                        <p:selectOneMenu id="per" value="#{ReembolsoC.reembolso.personal.idper}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" requiredMessage="Seleccione el solicitante" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{personaC.listadoPer}" var="solicitante"
+                                           itemValue="#{solicitante.idper}"
+                                           itemLabel="#{solicitante.nombre}
+                                           #{solicitante.apellido}"/>
+                        </p:selectOneMenu>
+                        <p:message  id="msgNombres" for="per" />
+
+                        <p:outputLabel value="Motivo" for="actividad"/>
+                        <p:inputText id="actividad" value="#{ReembolsoC.reembolso.MOTREE}" maxlength="200" required="true" requiredMessage="Digitar el motivo">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _-]/"/>
+                            <p:tooltip for="actividad" value="Digitar el motivo" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message   for="actividad" />
+
+                        <p:outputLabel value="Fecha"/>
+                        <p:calendar id="Fecval" value="#{ReembolsoC.reembolso.FECREE}"
+                                    showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                    size="20" required="true" requiredMessage="Ingrese la fecha" >
+                        </p:calendar>   
+                        <p:message   for="Fecval" />           
+
+                        <p:outputLabel value="Centro de Costo" for="cencos"/>
+                        <p:selectOneMenu id="cencos" value="#{ReembolsoC.reembolso.CODCEN}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el Centro de Costo" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                           itemValue="#{centrocosto.CODCEN}"
+                                           itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                        </p:selectOneMenu>
+                        <p:message   for="cencos" />  
+
+                        <p:outputLabel value="Forma de Pago"  for="forma"/>
+                        <p:selectOneMenu id="forma" value="#{ReembolsoC.reembolso.FORREE}"  required="true" requiredMessage="Digitar la forma de pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Soles " itemValue="Soles"/>
+                            <f:selectItem itemLabel="Dolar" itemValue="Dolar"/>      
+                        </p:selectOneMenu>
+                        <p:message for="forma" />
+
+                        <p:outputLabel value="Modo de Pago"  for="modo"/>
+                        <p:selectOneMenu id="modo" value="#{ReembolsoC.reembolso.PAGREE}"  required="true" requiredMessage="Digitar el modo de  pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Efectivo " itemValue="E"/>
+                            <f:selectItem itemLabel="Cheque" itemValue="C"/>      
+                        </p:selectOneMenu>
+                        <p:message for="modo" />
+
+                        <p:outputLabel value="Tipo de Cuenta"  for="tipo"/>
+                        <p:selectOneMenu id="tipo" value="#{ReembolsoC.reembolso.NAHREE}"  required="true" requiredMessage="Digitar el modo de  pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Cuenta Ahorros " itemValue="A"/>
+                            <f:selectItem itemLabel="Cuenta Corriente" itemValue="C"/>      
+                        </p:selectOneMenu>
+                        <p:message for="tipo" />
+
+                        <p:outputLabel value="N°Cuenta" />
+                        <p:inputText id="Cuenta" value="#{ReembolsoC.reembolso.NCUREE}" maxlength="14"  required="true" requiredMessage="Digitar el número de cuenta">
+                            <p:keyFilter regEx="/[0-9]/" />
+                            <f:validateLength minimum="13"/>
+                            <p:ajax  update="msgCuenta" delay="800" event="keyup" />
+                            <p:tooltip for="Cuenta" value="Digite el numero de cuenta" trackMouse="focus"/>
+                        </p:inputText> 
+                        <p:message id="msgCuenta" for="Cuenta"  showDetail="true" />
+
+
+
+                        <p:commandButton value="Registrar" actionListener="#{ReembolsoC.registrar()}" update=" :formtwo:tablaRee mensaje" style="background-color:  background"/>
+                        <!--<p:commandButton value="Listar" actionListener="{personeroC.listar()}" update="tablaPer" />-->
+
+                    </p:panelGrid>
+
+                </center>
+            </h:form>    
+
+
+
+            <h:form id="formtwo">
+
+                <!--    Formulario de Reembolso   >-->
+
+                <!--              Listado de  Reembolso-->
+                <p:dataTable var="tblree" id="tablaRee" value="#{ReembolsoC.listadoReembolso}" rows="10" 
+                             paginator="true" widgetVar="tblReembolsoO" selection="#{ReembolsoC.reembolso}" 
+                             resizableColumns="true" 
+                             selectionMode="single"
+                             rowKey="#{tblree.IDREE}"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             rowsPerPageTemplate="5,10,{ShowAll|'All'}" 
+                             rowStyleClass="registroVinculado">  
+
+                    <f:facet name="header">
+
+                        <div style="float: left">
+                            <h:form>
+                                <p:outputLabel value="FILTRO POR: " style="align-content: center; alignment-adjust: central; color:black font-weight:bold "/>
+                                <center>
+                                    <p:selectOneMenu value="#{ReembolsoC.tipo}" style="width: 100px">
+                                        <f:selectItem itemValue="1" itemLabel="Activos"/> 
+                                        <f:selectItem itemValue="2" itemLabel="Inactivos"/>
+                                        <f:selectItem itemValue="3" itemLabel="Todos"/>
+                                        <p:ajax listener="#{ReembolsoC.listar()}" update=":formtwo:tablaRee"/>
+                                    </p:selectOneMenu>
+                                </center>
+                            </h:form>
+                        </div>
+
+                        <div style="float: right">
+                            <p:commandButton value="Exportar Reembolso" actionListener="#{ReembolsoC.reportePersona()}" 
+                                             ajax="false" style="background-color:yellowgreen;color:black;font-weight:bold;"/>
+                            <p:commandButton value="PDF" icon="pi pi-file-pdf" styleClass="p-mr-2 p-mb-2">
+                                <p:dataExporter type="pdf" target=":formtwo:tablaRee" fileName="ListaReembolso_PDF" options="#{ReembolsoC.pdfOpt}" pageOnly="true" />
+                            </p:commandButton>
+                            <p:commandButton value="Excel" icon="pi pi-file-excel" styleClass="p-mr-2 p-mb-2">
+                                <p:dataExporter type="xls" target=":formtwo:tablaRee" fileName="ListaReembolsoXLS" options="#{ReembolsoC.excelOpt}" pageOnly="true" />
+                            </p:commandButton>     
+                        </div>
+
+                    </f:facet>
+
+                    <f:facet name= "header"><center style="color:black; font-weight:bold; font-size:25px">LISTADO DE LOS REEMBOLSOS</center></f:facet>
+
+                    <p:column style="width:90px" headerText="Nombre     -    Dni"  sortBy="#{tblree.NOMPER}" filterBy="#{tblree.NOMPER}"> 
+                        <h:outputText value="#{tblree.NOMPER}" />
+                    </p:column>
+                    <p:column style="width:125px" headerText="Motivo"  sortBy="#{tblree.MOTREE}" filterBy="#{tblree.MOTREE}">
+                        <h:outputText value="#{tblree.MOTREE}" />
+                    </p:column>
+                    <p:column style="width:60px" headerText="Fecha" sortBy="#{tblree.FECREE}" filterBy="#{tblree.FECREE}">
+                        <h:outputText value="#{tblree.FECREE}">
+                            <f:convertDateTime type="Date" pattern="dd-MMM-yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="width:190px" headerText="Descripción"  sortBy="#{tblree.DESCEN}" filterBy="#{tblree.DESCEN}">
+                        <h:outputText value="#{tblree.DESCEN} -  #{tblree.ARECEN}" />
+                    </p:column>
+                    <p:column style="width:40px" headerText="Centro Costo"  sortBy="#{tblree.DESCEN}" filterBy="#{tblree.DESCEN}">
+                        <h:outputText value="#{tblree.CODCEN}" />
+                    </p:column>
+<!--                    <p:column style="width:90px" headerText="N°de Liq"  sortBy="#{tblree.IDLIQ}" filterBy="#{tblree.IDLIQ}">
+                        <h:outputText value="#{tblree.IDLIQ}" />
+                    </p:column>-->
+                    <p:column style="width:40px" headerText="Forma"  sortBy="#{tblree.FORREE}" filterBy="#{tblree.FORREE}">
+                        <h:outputText value="#{tblree.FORREE}" />
+                    </p:column>
+<!--                    <p:column style="width:85px" headerText="Pago"  sortBy="#{tblree.PAGREE}" filterBy="#{tblree.PAGREE}">
+                        <h:outputText value="#{tblree.PAGREE}" />
+                    </p:column>-->
+<!--                    <p:column style="width:60px" headerText="Tipo de Cuenta"  sortBy="#{tblree.NAHREE}" filterBy="#{tblree.NAHREE}">
+                        <h:outputText value="#{tblree.NAHREE}" />
+                    </p:column>-->
+                    <p:column style="width:70px" headerText="N° Cuenta"  sortBy="#{tblree.NCUREE}" filterBy="#{tblree.NCUREE}">
+                        <h:outputText value="#{tblree.NCUREE}" />
+                    </p:column>
+                    <p:column style="width:70px" headerText="Devolución"  sortBy="#{tblree.SALREE}" filterBy="#{tblree.SALREE}">
+                        <h:outputText value="#{tblree.SALREE}" />
+                    </p:column>
+
+
+                    <f:facet name="footer">
+                        EN TOTAL HAY#{fn:length(ReembolsoC.listadoReembolso)} REGISTROS.
+                    </f:facet>
+                </p:dataTable>
+
+                <p:contextMenu for="tablaRee">
+                    <p:menuitem value="Modificar" icon="pi pi-pencil" oncomplete="PF('wdlgDatos').show()" update=":formthree">
+                    </p:menuitem>
+                    <p:menuitem value="Eliminar" icon="pi pi-trash" actionListener="#{ReembolsoC.eliminar()}" update=":formtwo:tablaRee mensaje">
+                        <p:confirm header="Confirmación" message="¿Deseas eliminar?"/>                 
+                    </p:menuitem>
+                </p:contextMenu>
+            </h:form>
+
+
+            <!--DATOS DEL REEMBOLSO-->
+            <p:dialog header="Datos de Reembolso" widgetVar="wdlgDatos" id="dlgDatos">
+                <h:form id="formthree">
+                    <p:panelGrid columns="3">
+                        <p:outputLabel value="Solicitante" for="per"/>
+                        <p:selectOneMenu id="per" value="#{ReembolsoC.reembolso.personal.idper}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" requiredMessage="Seleccione el solicitante" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{personaC.listadoPer}" var="solicitante"
+                                           itemValue="#{solicitante.idper}"
+                                           itemLabel="#{solicitante.nombre}
+                                           #{solicitante.apellido}"/>
+                        </p:selectOneMenu>
+                        <p:message  id="msgNombres" for="per" />
+
+                        <p:outputLabel value="Motivo" for="actividad"/>
+                        <p:inputText id="actividad" value="#{ReembolsoC.reembolso.MOTREE}" maxlength="200" requiredMessage="Digitar el motivo">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _-]/"/>
+                            <p:tooltip for="actividad" value="Digitar el motivo" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message   for="actividad" />
+
+                        <p:outputLabel value="Fecha"/>
+                        <p:calendar id="Fecval" value="#{ReembolsoC.reembolso.FECREE}"
+                                    showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                    size="20" required="true" requiredMessage="Ingrese la fecha" >
+                        </p:calendar>   
+                        <p:message   for="Fecval" />           
+
+                        <p:outputLabel value="Centro de Costo" for="cencos"/>
+                        <p:selectOneMenu id="cencos" value="#{ReembolsoC.reembolso.CODCEN}" style="width:300px"
+                                         filter="true" filterMatchMode="contains"  requiredMessage="Seleccione el Centro de Costo" >
+                            <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                            <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                           itemValue="#{centrocosto.CODCEN}"
+                                           itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                        </p:selectOneMenu>
+
+
+                        <p:outputLabel value="Forma de Pago"  for="forma"/>
+                        <p:selectOneMenu id="forma" value="#{ReembolsoC.reembolso.FORREE}" requiredMessage="Digitar la forma de pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Soles " itemValue="Soles"/>
+                            <f:selectItem itemLabel="Dolar" itemValue="Dolar"/>      
+                        </p:selectOneMenu>
+                        <p:message for="forma" />
+
+                        <p:outputLabel value="Modo de Pago"  for="modo"/>
+                        <p:selectOneMenu id="modo" value="#{ReembolsoC.reembolso.PAGREE}" requiredMessage="Digitar el modo de  pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Efectivo " itemValue="E"/>
+                            <f:selectItem itemLabel="Cheque" itemValue="C"/>      
+                        </p:selectOneMenu>
+                        <p:message for="modo" />
+
+                        <p:outputLabel value="Tipo de Cuenta"  for="tipo"/>
+                        <p:selectOneMenu id="tipo" value="#{ReembolsoC.reembolso.NAHREE}"   requiredMessage="Digitar el modo de  pago" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Cuenta Ahorros " itemValue="A"/>
+                            <f:selectItem itemLabel="Cuenta Corriente" itemValue="C"/>      
+                        </p:selectOneMenu>
+                        <p:message for="tipo" />
+
+                        <p:outputLabel value="N°Cuenta" />
+                        <p:inputText id="Cuenta" value="#{ReembolsoC.reembolso.NCUREE}" maxlength="14"   requiredMessage="Digitar el número de cuenta">
+                            <p:keyFilter regEx="/[0-9]/" />
+                            <f:validateLength minimum="13"/>
+                            <p:ajax  update="msgCuenta" delay="800" event="keyup" />
+                            <p:tooltip for="Cuenta" value="Digite el numero de cuenta" trackMouse="focus"/>
+                        </p:inputText> 
+                        <p:message id="msgCuenta" for="Cuenta"  showDetail="true" />
+
+
+                        <p:commandButton value="Modificar" actionListener="#{ReembolsoC.modificar()}" 
+                                         update=":formtwo:tablaRee" oncomplete="PF('wdlgDatos').hide();" >
+                            <p:confirm header="Confirmación" message="¿Deseas Modificar?" icon="ui-icon-alert"/>
+                            <p:tooltip trackMouse="true"/>
+                        </p:commandButton>
+                        <p:commandButton value="Cancelar" immediate="true" oncomplete="PF('wdlgDatos').hide();" />
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                        </p:confirmDialog>
+
+                    </p:panelGrid>
+                </h:form>
+            </p:dialog>
+        </h:body>
+    </ui:define>
+
+</ui:composition>

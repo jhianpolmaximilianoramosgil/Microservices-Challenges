@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./Plantilla.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="content">
+        <h:head>
+
+        </h:head>
+        <h:outputStylesheet library="css" name="primeflex.min.css"/>
+        <h:outputStylesheet library="css" name="primeflex.css"/>
+
+        <h:body>  
+            <h:form>
+                <p:fragment>
+                    <p:dialog> 
+                        <div align="center">
+                            <h4>TIEMPO DE INICIO DE SESION</h4>
+                            <h:outputText id="contador" value="#{dashboardC.number}" style="font-size: 36px;font-weight: bold;color: #D32F2F"></h:outputText>
+                            <p:progressBar value="#{dashboardC.number}" id="contador1" displayOnly="true"/>
+                            <p:poll id="poll" interval="1" process="contador" listener="#{dashboardC.decrementoNumero()}" update="contador contador1"></p:poll>  
+                            <p:idleMonitor timeout="1">
+                                <p:ajax event="active" listener="#{dashboardC.activarSesion()}"></p:ajax>
+                            </p:idleMonitor>
+                        </div>
+                    </p:dialog>
+                </p:fragment>
+            </h:form>
+
+            <div>
+                <center>
+                    <h:form>
+                        <h1 style="color:black; font-weight:bold; font-size:30px">MANUAL Dev - User </h1>
+                        <p:panelGrid columns="2" styleClass="ui-noborder">
+                            <p:commandButton value="Ver Manual de Usuario" icon="pi pi-file-pdf" oncomplete="PF('wdlgManualUsuario').show();" style="font-size:20px; font-weight:bold"/>
+                            <p:commandButton value="Ver Manual de Desarrollador" icon="pi pi-file-pdf" oncomplete="PF('wdlgManualDesarrollador').show();" style="font-size:20px; font-weight:bold"/>
+                        </p:panelGrid>
+                    </h:form>
+                </center>
+            </div>
+            
+            <h:form>
+                <center>
+                    <p:dialog id="dlgUsuario" header="MANUAL DE USUARIO" widgetVar="wdlgManualUsuario" modal="true"
+                              showEffect="fade" hideEffect="fade" resizable="true" minimizable="true" maximizable="true">
+                        <p:media value="/resources/pdf/manualUsuario.pdf" width="100%" height="500px">
+                            <h:outputLink value="#{request.contextPath}/resources/pdf/manuales.pdf">click</h:outputLink>
+                        </p:media>
+                    </p:dialog>
+                    <p:dialog id="dlgDesarrollador" header="MANUAL DE DESARROLADOR" widgetVar="wdlgManualDesarrollador" modal="true"
+                              showEffect="fade"  hideEffect="fade" resizable="true" minimizable="true" maximizable="true">
+                        <p:media value="/resources/pdf/ManualDesarrollador.pdf" width="100%" height="500px">
+                            <h:outputLink value="#{request.contextPath}/resources/pdf/manuales.pdf">click</h:outputLink>
+                        </p:media>
+                    </p:dialog>
+                </center>
+            </h:form>
+            
+            <br/>
+            <br/>  
+            
+
+
+            <div class="p-grid">
+                <div class="p-col">
+                    <div class="box" style="background-color: #ced4da">
+                        <p:pieChart model="#{dashboardC.dashboardCargo}" style="width: 125%; height: 500px;"/>
+                    </div>
+                    <p/>
+                    <p  style="font-size: 150%;color:background; font-weight:bold; "><center> PERSONAL INGRESADO MEDIANTE SU CARGO</center> </p>
+                </div>  
+                <div class="p-col">
+                    <div class="box" style="background-color: #FEEDAF">
+                        <p:pieChart model="#{dashboardC.dashboardPersonal}" style="width: 125%; height: 500px;"/>
+                    </div>
+                    <p/>
+                    <p  style="font-size: 150%;color:background; font-weight:bold; "><center>PERSONAL ACTIVO E INACTIVO </center></p>
+                </div>  
+            </div>
+            <h:form> 
+                <center> 
+                    <p:linkButton value="VOLVER" outcome="/vistas/Personal" icon="ui-icon-arrow-right" style="font-size:35px; font-weight:bold"/>
+                </center>
+            </h:form>
+
+
+
+        </h:body>
+    </ui:define>
+</ui:composition>

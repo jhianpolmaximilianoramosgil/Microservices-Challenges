@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./Plantilla.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"> 
+
+    <body>
+
+        <ui:composition template="./Plantilla.xhtml">
+
+            <ui:define name="content">
+                <h:head>
+                    <title>Listado de Declaración Jurada</title>
+                    <f:event listener="#{DeJuradaC.listar()}" type="preRenderView" />
+                      <f:event type="preRenderView" listener="#{usuarioC.seguridadSesion()}"/>
+                </h:head>
+                <p:growl id="mensajes" severity="info,fatal" showSummary="true" showDetail="true"/>
+
+                <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+                <p:growl id="mensaje" showDetail="true" />
+                <p:growl id="growl-sticky" for="sticky-key" showDetail="true" sticky="true" />
+
+                <h:form id="form">
+
+                    <center>
+                        <!--    Formulario de declaracion jurada>-->   
+                        <p:panelGrid columns="4">
+                            <f:facet name= "header"> DATOS DE LA DECLARACION JURADA </f:facet> 
+
+                            <p:outputLabel value="Importe" />
+                            <p:inputText value="#{DeJuradaC.declaracion.importe}"  maxlength="3" required="true" requiredMessage="Digitar de 1 a 100" >
+                                <f:validateLongRange minimum="1" maximum="100"> </f:validateLongRange>                       
+                            </p:inputText>
+
+                            <p:outputLabel value="Proyecto" />
+                            <p:inputText value="#{DeJuradaC.declaracion.proyecto}" maxlength="500" required="true" requiredMessage="Digitar el proyecto">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                            </p:inputText>
+
+
+                            <p:outputLabel value="Centro de Costo" for="cencos"/>
+                            <p:selectOneMenu id="cencos" value="#{DeJuradaC.declaracion.CODCEN}" style="width:300px"
+                                             filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el Centro de Costo" >
+                                <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                                <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                               itemValue="#{centrocosto.CODCEN}"
+                                               itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Solicitante" for="per"/>
+                            <p:selectOneMenu id="per" value="#{DeJuradaC.declaracion.personal.idper}" style="width:300px"
+                                             filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el solicitante" >
+                                <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                                <f:selectItems value="#{personaC.listadoPer}" var="solicitante"
+                                               itemValue="#{solicitante.idper}"
+                                               itemLabel="#{solicitante.nombre}
+                                               #{solicitante.apellido}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Recibi monto de :" />
+                            <p:inputText value="#{DeJuradaC.declaracion.RECDEJ}"  maxlength="3" required="true" requiredMessage="Digitar de 1 a 100" >
+                                <f:validateLongRange minimum="1" maximum="100"> </f:validateLongRange>                       
+                            </p:inputText>
+
+                            <p:outputLabel value="Por concepto de " />
+                            <p:inputText value="#{DeJuradaC.declaracion.CONDEJ}" maxlength="500" required="true" requiredMessage="Digitar el concepto">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                            </p:inputText>
+
+                            <p:outputLabel value="Fecha"/>
+                            <p:calendar id="Fecval" value="#{DeJuradaC.declaracion.fecha}"
+                                        showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                        size="20" required="true" requiredMessage="Ingrese la fecha" >
+                            </p:calendar>   
+
+
+
+
+
+
+                            <p:commandButton value="Registrar" actionListener="#{DeJuradaC.registrar()}" update="form :formtwo:tablaDec mensaje" style="background-color:  background"/>
+                            <!--                <p:commandButton value="Listar" actionListener="{DeJuradaC.listar()}" update="tablaDec" />          -->
+
+
+                        </p:panelGrid>
+                    </center>
+                </h:form>
+                <P> </P>
+                <P> </P>
+
+
+                <h:form id="formtwo">
+                    <!--    Formulario de dejurada>-->
+
+                    <!--              Listado de dejurada-->
+
+                    <p:dataTable var="tbldec" id="tablaDec" value="#{DeJuradaC.listadoDec}" rows="10" 
+                                 paginator="true" widgetVar="tblDeJurada" selection="#{DeJuradaC.declaracion}" 
+                                 resizableColumns="true" 
+                                 selectionMode="single"
+                                 rowKey="#{tbldec.id}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                                 rowsPerPageTemplate="5,10,{ShowAll|'All'}" 
+                                 rowStyleClass="registroVinculado"  style="width:100%">  
+
+                        <f:facet name="header">
+                            <div style="float: left">
+                                <h:form>
+                                    <p:outputLabel value="FILTRO POR: " style="align-content: center; alignment-adjust: central; color:black font-weight:bold "/>
+                                    <center>
+                                        <p:selectOneMenu value="#{DeJuradaC.tipo}" style="width: 100px">
+                                            <f:selectItem itemValue="1" itemLabel="Activos"/> 
+                                            <f:selectItem itemValue="2" itemLabel="Inactivos"/>
+                                            <f:selectItem itemValue="3" itemLabel="Todos"/>
+                                            <p:ajax listener="#{DeJuradaC.listar()}" update=":formtwo:tablaDec"/>
+                                        </p:selectOneMenu>
+                                    </center>
+                                </h:form>
+                            </div>
+
+                            <!--                            <p:outputPanel>
+                                                            <h:outputText value="Buscar:"/>
+                                                            <h:inputText id="globalFilter" onkeyup="PF('tblDeJurada').filter()" style="width:200px"/>
+                                                        </p:outputPanel>-->
+
+                            <div style="float: right">
+
+                                <p:commandButton value="GENERAR REPORTE" actionListener="#{DeJuradaC.reporteDeJurada()}"  onclick="this.form.target = '_blank'"
+                                                 ajax="false" style="weight:bold"/>  
+                                <p:commandButton value="PDF" icon="pi pi-file-pdf" styleClass="p-mr-2 p-mb-2">
+                                    <p:dataExporter type="pdf" target=":formtwo:tablaDec" fileName="ListaDeclaracionJurada_PDF" options="#{DeJuradaC.pdfOpt}"/>
+                                </p:commandButton>
+                                <p:commandButton value="EXCEL" icon="pi pi-file-excel" styleClass="p-mr-2 p-mb-2">
+                                    <p:dataExporter type="xls" target=":formtwo:tablaDec" fileName="ListaDeclaracionJurada_XLS" options="#{DeJuradaC.excelOpt}" />
+                                </p:commandButton>
+
+                            </div>
+                        </f:facet>
+
+                        <f:facet name= "header"><center style="color:black; font-weight:bold; font-size:25px">LISTADO DE LA DECLARACIÓN JURADA</center></f:facet>
+      <!--                <p:column style="width:50px" headerText="Id" sortBy="#{tbldec.id}" filterBy="#{tbldec.id}" >
+                          <h:outputText value="#{tbldec.id}"/>
+                      </p:column>-->
+                        <p:column style="width:35px" headerText="Importe"  sortBy="#{tbldec.importe}" filterBy="#{tbldec.importe}">
+                            <h:outputText value="#{tbldec.importe}" />
+                        </p:column>
+                        <p:column style="width:85px" headerText="Proyecto"   sortBy="#{tbldec.proyecto}" filterBy="#{tbldec.proyecto}">
+                            <h:outputText value="#{tbldec.proyecto}" />
+                        </p:column>
+                        <p:column style="width:150px" headerText="Centro de costo"  sortBy="#{tbldec.DESCEN}" filterBy="#{tbldec.DESCEN}">
+                            <h:outputText value="#{tbldec.DESCEN} - #{tbldec.CODCEN} - #{tbldec.ARECEN}" />
+                        </p:column>
+                        <p:column style="width:90px" headerText="Solicitante" sortBy="#{tbldec.nomper}" filterBy="#{tbldec.nomper}">
+                            <h:outputText value="#{tbldec.nomper} - #{tbldec.APEPER} - #{tbldec.dni}" />
+                        </p:column>
+                        <p:column style="width:150px" headerText="DIRECCIÓN"  sortBy="#{tbldec.DISUBI}" filterBy="#{tbldec.DISUBI}">
+                            <h:outputText value="#{tbldec.DEPUBI} - #{tbldec.PROUBI} - #{tbldec.DISUBI} - #{tbldec.domicilio}" />
+                        </p:column>
+                        <p:column style="width:35px" headerText="Recibí" sortBy="#{tbldec.RECDEJ}" filterBy="#{tbldec.RECDEJ}">
+                            <h:outputText value="#{tbldec.RECDEJ}" />
+                        </p:column>
+                        <p:column style="width:85px" headerText="Por concepto de :" sortBy="#{tbldec.CONDEJ}" filterBy="#{tbldec.CONDEJ}">
+                            <h:outputText value="#{tbldec.CONDEJ}" />
+                        </p:column>
+                        <p:column style="width:35px" headerText="Fecha" sortBy="#{tbldec.fecha}" filterBy="#{tbldec.fecha}">
+                            <h:outputText value="#{tbldec.fecha}">
+                                <f:convertDateTime type="Date" pattern="dd-MMM-yyyy"/>
+                            </h:outputText>
+                        </p:column>
+
+
+                        <p:column headerText="" style="width:15px; color:black" exportable="false">
+                            <p:commandButton id="vale" actionListener="#{DeJuradaC.reporteIdDej(tbldec)}" ajax="false"
+                                             onclick="this.form.target = '_blank'" icon="pi pi-arrow-down">
+                                <p:tooltip for="vale" value="VISUALIZACIÓN DE LA DECLARACIÓN" trackMouse="focus"/>
+                            </p:commandButton>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            EN TOTAL HAY#{fn:length(DeJuradaC.listadoDec)} REGISTROS.
+                        </f:facet>
+                    </p:dataTable>
+
+
+                    <p:contextMenu for="tablaDec">
+                        <p:menuitem value="Modificar" icon="pi pi-pencil" oncomplete="PF('wdlgDatos').show()" update=":formthree">
+                        </p:menuitem>
+                        <p:menuitem value="Eliminar" icon="pi pi-trash" actionListener="#{DeJuradaC.deleteEstado()}" update=":formtwo:tablaDec mensaje">
+                            <p:confirm header="Confirmación" message="¿Deseas eliminar?"/>                 
+                        </p:menuitem>         
+                    </p:contextMenu>
+                </h:form>
+
+
+                <!--DATOS DE REEMBOLSO-->
+                <p:dialog header="Datos de la declaracion jurada" widgetVar="wdlgDatos" id="dlgDatos">
+                    <h:form id="formthree">
+                        <p:panelGrid columns="2">
+                            <p:outputLabel value="Importe" />
+                            <p:inputText value="#{DeJuradaC.declaracion.importe}"  maxlength="3" required="true" requiredMessage="Digitar de 1 a 100" >
+                                <f:validateLongRange minimum="1" maximum="100"> </f:validateLongRange>                       
+                            </p:inputText>
+
+                            <p:outputLabel value="Proyecto" />
+                            <p:inputText value="#{DeJuradaC.declaracion.proyecto}" maxlength="500" required="true" requiredMessage="Digitar el proyecto">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                            </p:inputText>
+
+
+                            <p:outputLabel value="Centro de Costo" for="cencos"/>
+                            <p:selectOneMenu id="cencos" value="#{DeJuradaC.declaracion.CODCEN}" style="width:300px"
+                                             filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el Centro de Costo" >
+                                <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                                <f:selectItems value="#{centrocostoC.listadoCentroCosto}" var="centrocosto"
+                                               itemValue="#{centrocosto.CODCEN}"
+                                               itemLabel="#{centrocosto.DESCEN}- #{centrocosto.ARECEN}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Solicitante" for="per"/>
+                            <p:selectOneMenu id="per" value="#{DeJuradaC.declaracion.personal.idper}" style="width:300px"
+                                             filter="true" filterMatchMode="contains" required="true" requiredMessage="Seleccione el solicitante" >
+                                <f:selectItem noSelectionOption="true" itemLabel="seleccione" itemValue="#{null}"/>
+                                <f:selectItems value="#{personaC.listadoPer}" var="solicitante"
+                                               itemValue="#{solicitante.idper}"
+                                               itemLabel="#{solicitante.nombre}
+                                               #{solicitante.apellido}"/>
+                            </p:selectOneMenu>
+
+                            <p:outputLabel value="Recibi monto de :" />
+                            <p:inputText value="#{DeJuradaC.declaracion.RECDEJ}"  maxlength="3" required="true" requiredMessage="Digitar de 1 a 100" >
+                                <f:validateLongRange minimum="1" maximum="100"> </f:validateLongRange>                       
+                            </p:inputText>
+
+                            <p:outputLabel value="Por concepto de " />
+                            <p:inputText value="#{DeJuradaC.declaracion.CONDEJ}" maxlength="500" required="true" requiredMessage="Digitar el concepto">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ _,_;]/"/>
+                            </p:inputText>
+
+                            <p:outputLabel value="Fecha"/>
+                            <p:calendar id="Fecval" value="#{DeJuradaC.declaracion.fecha}"
+                                        showOn="button" pattern="dd-MM-yyyy" mask="true" navigator="true" mindate="@now"
+                                        size="20" required="true" requiredMessage="Ingrese la fecha" >
+                            </p:calendar>   
+
+                            <p:commandButton value="Modificar" actionListener="#{DeJuradaC.modificar()}" 
+                                             update=":formtwo:tablaDec" oncomplete="PF('wdlgDatos').hide();" >
+                                <p:confirm header="Confirmación" message="¿Deseas Modificar?" icon="ui-icon-alert"/>
+                                <p:tooltip trackMouse="true"/>
+                            </p:commandButton>
+                            <p:commandButton value="Cancelar" immediate="true" oncomplete="PF('wdlgDatos').hide();" />
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                            </p:confirmDialog>
+
+                        </p:panelGrid>
+                    </h:form>
+                </p:dialog>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</ui:composition>

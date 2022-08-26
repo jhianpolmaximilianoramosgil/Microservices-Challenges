@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>SISREGVG</title>
+        <link rel ="stylesheet" type="text/css" href="../resources/css/bootstrap.min.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/css/fontawesome-all.min.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/css/iofrm-style.css"/>
+        <link rel="stylesheet" type="text/css" href="../resources/css/iofrm-theme7.css"/>
+        <link href="resources/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="resources/css/fontawesome-all.min.css" rel="stylesheet" type="text/css"/>
+        <link href="resources/css/iofrm-style.css" rel="stylesheet" type="text/css"/>
+        <link href="resources/css/iofrm-theme7.css" rel="stylesheet" type="text/css"/>
+    </h:head>
+
+    <h:body id="body">
+        <p:growl id="msj" showDetail="true" >
+            <p:autoUpdate/>
+        </p:growl>
+        <div class="form-body">
+            <div class="row">
+                <div class="img-holder">
+                    <div class="bg"></div>
+                    <div class="info-holder">
+                        <img src="resources/images/LogitoSis.png" alt=""/>
+                    </div>
+                </div>
+                <div class="form-holder">
+                    <div class="form-content">
+                        <div class="form-items">
+                           <h3 class="title" style="color:black; font-weight:bold; font-size:50px"> <center> SISREGVG</center> </h3>
+                            <p> SISTEMA DE REGISTRO DE GASTOS PARA VALLE GRANDE </p>
+                            <div class="page-links">
+                                <a class="active"></a><a href="/Sisregvg_ODAO/faces/login_1.xhtml"> Iniciar Sesión</a>
+                                <a class="active"> </a><a href="/Sisregvg_ODAO/faces/registrar.xhtml">Registrar</a>
+
+                                <a class="active">Ayuda</a><a href="/Sisregvg_ODAO/faces/login_1.xhtml"></a>
+                            </div>
+                            <h:form id="frminiciarsesion">
+                                <h1 class="title" style="color:black; font-weight:bold; font-size:18px">¿Se te olvidó tu contraseña?</h1>
+                                 <h1 class="title" style="color:black;  font-size:14px">No te preocupes, nosotros te ayudamos, brindanos tu correo para poder enviarte tu nueva contraseña</h1>
+                                <p:outputLabel value = "Email" for="txtCorreo"/>
+                                <p:inputText value ="#{usuarioC.usuario.email}" id="txtCorreo" maxlength="50" 
+                                             requiredMessage="Ingrese correo electrónico" style="width: 100%" >
+                                    <f:validator validatorId="vCorreo" />
+                                    <p:ajax  update="msgCorreo" delay="800" event="keyup" />
+                                    <p:tooltip for="txtCorreo" value="Digite su Correo" trackMouse="focus"/>
+                                </p:inputText>
+                                <p:message id="msgCorreo" for="txtCorreo"  showDetail="true" />
+
+                              
+                                <div class="form-button">
+                                    <center> <p:commandButton actionListener="#{usuarioC.refactorPWD()}"
+                                                              update="frminiciarsesion" 
+                                                              value="Acceder"
+                                                              class="ibtn"
+                                                              /> </center> 
+                                </div>
+
+                                <p:commandButton value="Block Panel" onclick="PF('widgetBlock').show()" onkeyup="#{LoginC.capcha}"/>
+                                <p:commandButton value="Unblock Panel" onclick="PF('widgetBlock').hide()"/>
+
+                                <p:blockUI block="body" widgetVar="widgetBlock">
+                                    <p:graphicImage value="resources/images/tiempo_cinco.gif"></p:graphicImage>
+                                </p:blockUI>
+                            </h:form>
+                            <div class="other-links">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </h:body>
+</html>

@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+    <h:head>
+        <title>SISREGVG</title>
+        <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+    </h:head>
+
+    <h:body>
+<!--          <style>
+ <p:graphicImage name="images/regi.png" style="height:3%;max-width:95%;"/> 
+            body {background-color: #dae0e5;}
+        </style>-->
+        <h:form> 
+            <p:card style="height:1%;max-width:95%; background:#D7D8D9;"> 
+            <p:graphicImage name="images/regi.png" style="height:3%;max-width:95%;"/> 
+            </p:card>
+        </h:form>
+        <center>
+            <f:facet name="HOLETAS"/>
+            <h:form>
+                <p:panelGrid id="formu" columns="3" styleClass="ui-noborder">
+                    <h:form> 
+                        <p:card style="width:25em; background:#FFCDD2;">
+                            <p:linkButton value="POKEBOLAS" style="font-size:25px; font-weight:bold"/>
+                            <f:facet name="footer">
+                                <p:graphicImage name="images/PACO.jpg" style="width:300px;height:100px;"/>
+                            </f:facet>
+                            <f:facet name="header">
+                                <h1 style="color:black; font-weight:bold; font-size:10px">Empresa de formastos de registro de gastos de Valle Grande</h1>
+                            </f:facet>
+                        </p:card>
+                    </h:form>
+                    <h:form> 
+                        <p:card style="width:25em; background:#ced4da;"> 
+                            <f:facet name= "header"><center style="color:black; font-weight:bold; font-size:45px">SISREGVG</center></f:facet> 
+                            <f:facet name= "header"> INICIAR SESIÓN </f:facet>  
+
+                            <p:outputLabel value="Usuario" for ="usu"/>
+                            <p:inputText id="usu"  value="#{usuarioC.usuario.USUUSU}" maxlength="30"  requiredMessage="Digitar su usuario">
+                                <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ ]/"/>
+                                <p:tooltip for="usu" value="Digite su usuario" trackMouse="focus"/>
+                            </p:inputText> 
+
+                            <p:outputLabel value="Contraseña " for ="contra"/>
+                            <p:inputText id="contra" type="password" value="#{usuarioC.usuario.PWDUSU}" placeholder="Escribe tu contraseña"  maxlength="15">
+                                <p:tooltip for="contra" value="Digite su contraseña" trackMouse="focus"/>
+                            </p:inputText>
+                             <p>
+                                    
+                                </p>
+                            <center>   <p:commandButton value="Ingresar" actionListener="#{usuarioC.acceso()}"/> </center>
+                               <p>
+                                    
+                                </p>
+                            <center>   <p:commandButton value="Ayuda" actionListener="#{usuarioC.acceso()}"/> 
+                             
+                           <p:commandButton value="Olvidé mi contraseña" actionListener="#{usuarioC.acceso()}"/> </center>
+<!--                          <p:panelGrid columns="2" styleClass="ui-noborder">
+                            <p:commandButton value="INICIAR SESIÓN"/>
+                            <p:commandButton value="INICIAR SESIÓN"/>
+                        </p:panelGrid>-->
+                        </p:card>
+                    </h:form>
+
+                    <h:form>
+                        <p:card style="width:25em; background:#ffffff;">
+                            <center>
+                                <p:galleria value="#{galleria.imagenes}" var="imagen" panelHeight="270" panelWidth="350" >
+                                    <p:graphicImage url="resources/images/gallery/#{imagen}"  style="font-size:25px; font-weight:bold" />
+                                </p:galleria>
+                            </center>
+                        </p:card>
+                    </h:form>
+                </p:panelGrid>
+            </h:form> 
+
+            <h:form>
+
+                <!--                <center>
+                                    <p:galleria value="#{galleria.imagenes}" var="imagen" panelHeight="300" panelWidth="350"  >
+                                        <p:graphicImage url="jpg/#{imagen}"  style="font-size:25px; font-weight:bold; alignment-adjust: rigth" />
+                                    </p:galleria>
+                                </center>-->
+
+            </h:form>
+        </center>
+    </h:body>
+</html>
+

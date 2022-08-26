@@ -1,0 +1,304 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="./Plantilla.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="content">
+        <h:head>
+            <title>Listado del Personal</title>
+            <f:event listener="#{personaC.listar()}" type="preRenderView" />
+       <f:event type="preRenderView" listener="#{usuarioC.seguridadSesion()}"/>
+        </h:head>
+        <p:growl id="mensajes" severity="info,fatal" showSummary="true" showDetail="true"/>
+
+        <h:body>      
+            <h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+            <p:growl id="mensaje" showDetail="true" />
+            <p:growl id="growl-sticky" for="sticky-key" showDetail="true" sticky="true" />
+
+            <!--            <h:form  prependId="false" id="form">
+                            <center>
+                                    Formulario del personal    >         
+                                                    <p:fragment> 
+                                <p:panelGrid id="prueba" columns="3" styleClass="ui-noborder">
+                                    <f:facet name= "header"> DATOS DEl PERSONAL </f:facet>
+                                    <p:outputLabel value="DNI" />
+                                    <p:commandButton value="Buscar" action="#{personaC.buscarDNI()}" update="form" style=" background-color: #506D84"> 
+                                        <p:inputText id="DNI" value="#{personaC.per.dni}" maxlength="8" placeholder="ejem: 74140394"   requiredMessage="Digitar el dni">
+                                            <p:keyFilter regEx="/[0-9]/" />       
+                                            <f:validator validatorId="vDni" />
+                                            <p:ajax listener="#{personaC.buscarDNI()}" update="form"/>
+                                            <p:ajax  update="msgDni" delay="800" event="keyup" />
+                                            <p:tooltip for="DNI" value="Digite su Dni" trackMouse="focus"/>
+                                        </p:inputText> 
+                                    </p:commandButton>
+                                    <p:message id="msgDni" for="DNI"  showDetail="true" />
+            
+                                    <p:outputLabel value="Nombre" for ="NOMPER"/>
+                                    <p:inputText id="NOMPER"  value="#{personaC.per.nombre}" maxlength="30"  requiredMessage="Digitar sus nombres"  >
+                                        <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ ]/"/>
+                                                                    <f:validator validatorId="Nombres" />
+                                        <p:ajax update="msgNombres" event="keyup" delay="800"  />
+                                        <p:tooltip for="NOMPER" value="Digite sus dos nombres" trackMouse="focus"/>
+                                    </p:inputText> 
+                                    <p:message  id="msgNombres" for="NOMPER" />
+                                    <p:outputLabel value="Apellido" />
+                                    <p:inputText id="APEPER"  value="#{personaC.per.apellido}" maxlength="30"   requiredMessage="Digitar sus apellidos">
+                                        <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ ]/"/>
+                                                                    <f:validator validatorId="Apellidos" />
+                                        <p:ajax update="msgApellidos" event="keyup" delay="800"  />
+                                        <p:tooltip for="APEPER" value="Digite sus dos apellidos" trackMouse="focus"/>
+                                    </p:inputText> 
+                                    <p:message  id="msgApellidos" for="APEPER" />
+            
+            
+                                    <p:outputLabel value = "Email" for="txtCorreo"/>
+                                    <p:inputText value ="#{personaC.per.email}" id="txtCorreo" maxlength="50" required="true" 
+                                                 requiredMessage="Ingrese correo electrónico" style="width: 100%" >
+                                        <f:validator validatorId="vCorreo" />
+                                        <p:ajax  update="msgCorreo" delay="800" event="keyup" />
+                                        <p:tooltip for="txtCorreo" value="Digite su Correo" trackMouse="focus"/>
+                                    </p:inputText>
+                                    <p:message id="msgCorreo" for="txtCorreo"  showDetail="true" />
+            
+                                    <p:outputLabel value="Celular" for="celular"/> 
+                                    <p:inputText id="celular" value="#{personaC.per.celular}"   onkeyup="validarDocumento()"  maxlength="9" style="width: 310px;" requiredMessage="Digitar su Celular">
+                                        <p:keyFilter regEx="/[0-9]/"/>
+                                        <f:validator validatorId="vCelular" />
+                                                                    <f:validateLength minimum="9" maximum="9"/>
+                                        <p:ajax update="msgCelular" event="keyup" delay="800"  />
+                                        <p:tooltip  for="celular" value="Digite su Celular" trackMouse="focus"/>
+                                    </p:inputText>                   
+                                    <p:message id="msgCelular" for="celular"/>
+            
+                                    <p:outputLabel value="Sexo" for="sexo" />
+                                    <p:selectOneRadio id="sexo" value="#{personaC.per.sexo}"   requiredMessage="Digitar el sexo">
+                                        <f:selectItem itemLabel="Masculino" itemValue="M" />
+                                        <f:selectItem itemLabel="Femenino" itemValue="F" />
+                                        <p:ajax update="msgSexo" event="keyup" delay="800"  />
+                                    </p:selectOneRadio>
+                                    <p:message id="msgSexo" for="sexo" />
+            
+                                    <p:outputLabel value="Cargo"  for="cargo"/>
+                                    <p:selectOneMenu id="cargo" value="#{personaC.per.cargo}"   requiredMessage="Digitar el cargo" >
+                                        <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                                        <f:selectItem itemLabel="Trabajador" itemValue="Trabajador"/>
+                                        <f:selectItem itemLabel="Jefe de Área" itemValue="Jefe de Área"/>
+                                        <f:selectItem itemLabel="Director" itemValue="Director"/>          
+                                    </p:selectOneMenu>
+                                    <p:message for="cargo" />
+                                    <p></p>
+                                    <p:commandButton value="Registrar" actionListener="#{personaC.registrar()}" update=" :formtwo:tablaPer mensajes" style="font-size:25px; font-weight:bold"/> 
+            
+                                    <p:commandButton id="btnOrder" value="Regístrate" action="#{personaC.registrar()}"  style="font-size:25px; font-weight:bold"
+                                                     widgetVar="btnhola" disabled="PF('btnhola').disable();" update=" :formtwo:tablaPer mensajes"/>   
+            
+                                    desabilitar dormulario y agregar gif
+                                    <p:blockUI block="prueba" trigger="btnOrder">
+                                        Cargando <br />
+            
+                                        <p:graphicImage value="/resources/images/carga.gif"/>
+                                    </p:blockUI>
+            
+                                </p:panelGrid>
+                            </center>
+                                Formulario del personal   >
+                        </h:form>-->
+
+
+
+            <h:form id="formtwo">
+                <!--              Listado del personal-->
+                <p:dataTable var="tblpers" id="tablaPer" value="#{personaC.listadoPer}" rows="10" 
+                             paginator="true" widgetVar="tblPersonal" selection="#{personaC.per}" 
+                             resizableColumns="true" 
+                             selectionMode="single"
+                             rowKey="#{tblpers.idper}"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             currentPageReportTemplate="{startRecord}-{endRecord} of {totalRecords} records"
+                             rowsPerPageTemplate="5,10,{ShowAll|'All'}" 
+                             rowStyleClass="registroVinculado" style="width:100%" >
+
+                    <f:facet name="header">
+                        <center>
+                            <div style="float: left">
+                                <h:form>
+                                    <p:outputLabel value="FILTRO POR: " style="align-content: center; alignment-adjust: central; color:black font-weight:bold "/>
+                                    <center>
+                                        <p:selectOneMenu value="#{personaC.tipo}" style="width: 100px">
+                                            <f:selectItem itemValue="1" itemLabel="Activos"/> 
+                                            <f:selectItem itemValue="2" itemLabel="Inactivos"/>
+                                            <f:selectItem itemValue="3" itemLabel="Todos"/>
+                                            <p:ajax listener="#{personaC.listar()}" update=":formtwo:tablaPer"/>                                 
+                                        </p:selectOneMenu>
+                                             <p/>
+                                             <p/>
+                                    </center>
+                                     <p:linkButton value="Dashboard" outcome="/vistas/Dashboard" icon="pi pi-spin pi-spinner" style="font-size:15px; font-weight:bold"/>
+                                </h:form>
+                                <p/>
+                         
+                            </div>
+
+                            <div style="float: right">
+                                <p:commandButton value="Exportar Personas" actionListener="#{personaC.reportePersonal()}" 
+                                                 ajax="false" style="background-color:yellowgreen;color:black;font-weight:bold;"/>
+                                <p:commandButton value="Excel" icon="pi pi-file-excel" styleClass="p-mr-2 p-mb-2">
+                                    <p:dataExporter type="xls" target=":formtwo:tablaPer" fileName="ListaDelPersonal_XLS" options="#{personaC.excelOpt}" pageOnly="true" />
+                                </p:commandButton>     
+                            </div>
+                        </center>
+                    </f:facet>
+                    <p/>
+                    <f:facet name= "header"><center style="color:black; font-weight:bold; font-size:25px">LISTADO DEL PERSONAL</center></f:facet>
+
+                    <p:column style="width:116px" headerText="Nombres y Apellidos" sortBy="#{tblpers.nombre}" filterBy="#{tblpers.nombre}">
+                        <h:outputText value="#{tblpers.nombre.concat(' ').concat(tblpers.apellido)}"/>
+                    </p:column>   
+                    <p:column style="width:35px" headerText="Dni"  sortBy="#{tblpers.dni}" filterBy="#{tblpers.dni}">
+                        <h:outputText value="#{tblpers.dni}" />
+                    </p:column>
+                    <p:column style="width:40px" headerText="Celular" sortBy="#{tblpers.celular}" filterBy="#{tblpers.celular}">
+                        <h:outputText value="#{tblpers.celular}" />
+                    </p:column>
+                    <p:column style="width:115px" headerText="Email" sortBy="#{tblpers.email}" filterBy="#{tblpers.email}">
+                        <h:outputText value="#{tblpers.email}" />
+                    </p:column> 
+                    <p:column style="width:115px" headerText="Dtto - Prov - Dpto" sortBy="#{tblpers.disubi}" filterBy="#{tblpers.disubi}">
+                        <h:outputText value="#{tblpers.disubi}-#{tblpers.proubi}-#{tblpers.depubi}" />
+                    </p:column> 
+                    <p:column style="width:115px" headerText="Dirección" sortBy="#{tblpers.domper}" filterBy="#{tblpers.domper}">
+                        <h:outputText value="#{tblpers.domper}" />
+                    </p:column> 
+                    <p:column style="width:35px" headerText="Sexo" sortBy="#{tblpers.sexo}" filterBy="#{tblpers.sexo}">
+                        <h:outputText value="#{tblpers.sexo}" >
+                            <f:converter converterId="sexoConverter"/>
+                        </h:outputText>
+                    </p:column>             
+                    <p:column style="width:35px" headerText="Cargo" sortBy="#{tblpers.cargo}" filterBy="#{tblpers.cargo}">
+                        <h:outputText value="#{tblpers.cargo}" />
+                    </p:column>                
+
+                    <f:facet name="footer">     
+                        EN TOTAL HAY  #{fn:length(personaC.listadoPer)} REGISTROS.       
+                    </f:facet>           
+                </p:dataTable>
+
+
+                <p:contextMenu for="tablaPer">
+                    <p:menuitem value="Modificar" icon="pi pi-pencil" oncomplete="PF('wdlgDatos').show()" update=":formthree">
+                    </p:menuitem>
+                    <p:menuitem value="Eliminar" icon="pi pi-trash" actionListener="#{personaC.DeleteEstado()}" update=":formtwo:tablaPer mensaje">
+                        <p:confirm header="Confirmación" message="¿Deseas eliminar?"/>                         
+                    </p:menuitem>
+                </p:contextMenu>
+
+
+                <!--            Listado de la persona-->
+            </h:form>
+
+
+            <!--DATOS DEL PERSONAL-->
+            <p:dialog header="Datos del personal" widgetVar="wdlgDatos" id="dlgDatos">
+                <h:form id="formthree">
+                    <h:panelGrid columns="3" styleClass="ui-noborder">
+                        <p:outputLabel value="DNI" />
+                        <p:commandButton value="Buscar" action="#{personaC.buscarDNI()}" update="NOMPER APEPER" style=" background-color: #506D84"> 
+                            <p:inputText id="DNI" value="#{personaC.per.dni}" maxlength="8" placeholder="ejem: 74140394"  requiredMessage="Digitar el dni">
+                                <p:keyFilter regEx="/[0-9]/" />       
+                                <p:ajax  update="msgDni" delay="800" event="keyup" />
+                                <p:tooltip for="DNI" value="Digite su Dni" trackMouse="focus"/>
+                            </p:inputText> 
+                        </p:commandButton>
+                        <p:message id="msgDni" for="DNI"  showDetail="true" />
+
+                        <p:outputLabel value="Nombre" for ="NOMPER"/>
+                        <p:inputText id="NOMPER"  value="#{personaC.per.nombre}" maxlength="30"  requiredMessage="Digitar sus nombres"  >
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ ]/"/>
+                            <p:ajax update="msgNombres" event="keyup" delay="800"  />
+                            <p:tooltip for="NOMPER" value="Digite sus dos nombres" trackMouse="focus"/>
+                        </p:inputText> 
+                        <p:message  id="msgNombres" for="NOMPER" />
+
+                        <p:outputLabel value="Apellido" />
+                        <p:inputText id="APEPER"  value="#{personaC.per.apellido}" maxlength="30"  requiredMessage="Digitar sus apellidos">
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_ ]/"/>
+                            <p:ajax update="msgApellidos" event="keyup" delay="800"  />
+                            <p:tooltip for="APEPER" value="Digite sus dos apellidos" trackMouse="focus"/>
+                        </p:inputText> 
+                        <p:message  id="msgApellidos" for="APEPER" />
+
+                        <p:outputLabel value="Celular" for="celular"/> 
+                        <p:inputText id="celular" value="#{personaC.per.celular}"   onkeyup="validarDocumento()"  maxlength="9" style="width: 310px;" requiredMessage="Digitar su Celular">
+                            <p:keyFilter regEx="/[0-9]/"/>
+                            <p:ajax update="msgCelular" event="keyup" delay="800"  />
+                            <p:tooltip  for="celular" value="Digite su Celular" trackMouse="focus"/>
+                        </p:inputText>                   
+                        <p:message id="msgCelular" for="celular"/>
+
+                        <p:outputLabel value = "Email" for="txtCorreo"/>
+                        <p:inputText value ="#{personaC.per.email}" id="txtCorreo" maxlength="50" 
+                                     requiredMessage="Ingrese correo electrónico" style="width: 100%" >
+                            <p:ajax  update="msgCorreo" delay="800" event="keyup" />
+                            <p:tooltip for="txtCorreo" value="Digite su Correo" trackMouse="focus"/>
+                        </p:inputText>
+                        <p:message id="msgCorreo" for="txtCorreo"  showDetail="true" />
+
+                        <p:outputLabel value="Ubigeo" for="per"/>
+                        <p:selectOneMenu id="per" value="#{personaC.per.codubi}" style="width:300px"
+                                         filter="true" filterMatchMode="contains" requiredMessage="Seleccione el ubigeo" >
+                            <f:selectItem noSelectionOption="true" itemLabel="#{personaC.per.codubi}" itemValue="#{personaC.per.codubi}"/>
+                            <f:selectItems value="#{ubigeoC.listadoUbigeo}" var="ubigeo"
+                                           itemValue="#{ubigeo.CODUBI}"
+                                           itemLabel="#{ubigeo.DISUBI}- #{ubigeo.PROUBI}- #{ubigeo.DEPUBI}"/>
+                        </p:selectOneMenu>
+                        <p:message for="per" />
+
+                        <p:outputLabel value="DIRECCIÓN" for="direccion"/>
+                        <p:inputText id="direccion" value="#{personaC.per.domper}" maxlength="50"    requiredMessage="Digitar la direccion" >
+                            <p:keyFilter regEx="/[A-Z_a-z_ñ_á_é_í_ó_ú_0_:_._-_ _0-9]/" />                     
+                            <p:tooltip for="direccion" value="Digite su Dirección" trackMouse="focus"/>
+                            <p:ajax update="msgDireccion" event="keyup" delay="800"  />
+                        </p:inputText>
+                        <p:message id="msgDireccion" for="direccion" />
+
+                        <p:outputLabel value="Sexo" for="sexo" />
+                        <p:selectOneRadio id="sexo" value="#{personaC.per.sexo}"   requiredMessage="Digitar el sexo">
+                            <f:selectItem itemLabel="Masculino" itemValue="M" />
+                            <f:selectItem itemLabel="Femenino" itemValue="F" />
+                            <p:ajax update="msgSexo" event="keyup" delay="800"  />
+                        </p:selectOneRadio>
+                        <p:message id="msgSexo" for="sexo" />
+
+                        <p:outputLabel value="Cargo"  for="cargo"/>
+                        <p:selectOneMenu id="cargo" value="#{personaC.per.cargo}"   requiredMessage="Digitar el cargo" >
+                            <f:selectItem itemLabel="Seleccionar" itemValue=""/>
+                            <f:selectItem itemLabel="Monitor" itemValue="Monitor"/>
+                            <f:selectItem itemLabel="Jefe de Área" itemValue="Jefe de Área"/>
+                            <f:selectItem itemLabel="Tesorero" itemValue="Tesorero"/>        
+                        </p:selectOneMenu>
+                        <p:message for="cargo" />
+
+                        <p:commandButton value="Modificar" actionListener="#{personaC.modificar()}" 
+                                         update=" :formtwo:tablaPer mensaje" oncomplete="PF('wdlgDatos').hide();" >
+                            <p:confirm header="Confirmación" message="¿Deseas Modificar?" icon="ui-icon-alert"/>
+                            <p:tooltip trackMouse="true"/>
+                        </p:commandButton>
+                        <p:commandButton value="Cancelar" immediate="true" oncomplete="PF('wdlgDatos').hide();" />
+                        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                            <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                        </p:confirmDialog>
+                    </h:panelGrid>
+                </h:form>
+            </p:dialog>
+            <script src="./js/validator.js"></script>
+        </h:body>
+    </ui:define>
+</ui:composition>
